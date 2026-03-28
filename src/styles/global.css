@@ -159,6 +159,7 @@ img {
   font-family: var(--font-body);
   cursor: pointer;
   appearance: auto;
+  width: 160px;
 }
 
 .filter-bar select:hover {
