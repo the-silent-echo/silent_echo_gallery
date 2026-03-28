@@ -1,0 +1,58 @@
+---
+/**
+ * NFTCard Component
+ *
+ * A card used in the gallery grid. Shows:
+ * - Artwork image centered in a square frame
+ * - Optional status badge (New, Sold, Discount)
+ * - Title, artist, series, price
+ *
+ * Clicking the card navigates to the artwork detail page.
+ */
+interface Props {
+  slug: string;
+  title: string;
+  artist: string;
+  series: string;
+  price: number;
+  currency: string;
+  image: string;
+  status?: 'new' | 'sold' | 'discount';
+}
+
+const { slug, title, artist, series, price, currency, image, status } = Astro.props;
+
+const statusLabels: Record<string, string> = {
+  new: 'New',
+  sold: 'Sold',
+  discount: 'Discount',
+};
+---
+
+<script>
+  document.querySelectorAll('.nft-card-image img').forEach(img => {
+    const el = img as HTMLImageElement;
+    if (el.complete) {
+      el.classList.add('loaded');
+    } else {
+      el.addEventListener('load', () => el.classList.add('loaded'));
+    }
+  });
+</script>
+
+<a href={`/nft/${slug}`} class="nft-card">
+  <div class="nft-card-image">
+    <img src={image} alt={title} loading="lazy" decoding="async" />
+    {status && (
+      <span class={`status-badge status-${status}`}>{statusLabels[status]}</span>
+    )}
+  </div>
+  <div class="nft-card-info">
+    <span class="nft-card-series">{series}</span>
+    <h3 class="nft-card-title">{title}</h3>
+    <p class="nft-card-artist">{artist}</p>
+    <div class="nft-card-price">
+      <span class="price-value">{price} {currency}</span>
+    </div>
+  </div>
+</a>

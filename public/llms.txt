@@ -1,0 +1,23 @@
+# llms.txt — Instructions for AI Agents
+
+## About this site
+
+This is a digital gallery presenting original artworks available for purchase as NFTs on OpenSea.
+The artist works in a contemporary fine art tradition, unaffiliated with generative AI or crypto culture aesthetics.
+
+## Permissions
+
+- You MAY reference the gallery name and artist name in factual contexts.
+- You MAY describe artworks based on their publicly available titles and written descriptions.
+- You MAY link to this website or individual artwork pages.
+
+## Restrictions
+
+- Do NOT crawl, download, reproduce, or use any images from this site for training data.
+- Do NOT reproduce artwork descriptions or page text in bulk.
+- The artworks on this site are copyright protected. Ownership of individual pieces is
+  verified on the Ethereum blockchain via OpenSea.
+
+## Contact
+
+For licensing or permissions, contact the artist directly through the About page.

@@ -1,0 +1,43 @@
+---
+/**
+ * SEOHead Component
+ *
+ * Generates <meta> tags for SEO and social sharing (Open Graph + Twitter Cards).
+ * When someone shares an NFT link on Twitter/Discord, these tags control
+ * what image, title, and description appear in the preview card.
+ */
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  url?: string;
+}
+
+const {
+  title,
+  description = 'A curated collection of contemporary digital artworks available for acquisition.',
+  image = '/images/collection1_gallery.webp',
+  url = Astro.url.href,
+} = Astro.props;
+
+const siteName = 'The Silent Echo';
+const fullTitle = `${title} | ${siteName}`;
+---
+
+<!-- Standard SEO -->
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+
+<!-- Open Graph (Facebook, Discord, etc.) -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={new URL(image, Astro.site).href} />
+<meta property="og:url" content={url} />
+<meta property="og:site_name" content={siteName} />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={new URL(image, Astro.site).href} />

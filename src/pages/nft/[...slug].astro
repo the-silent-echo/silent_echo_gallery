@@ -1,0 +1,96 @@
+---
+/**
+ * NFT Detail Page ([...slug].astro → yoursite.com/nft/cosmic-ape-42)
+ *
+ * This is a dynamic route. The [...slug] in the filename means Astro
+ * generates one page per NFT at build time. The slug comes from the
+ * markdown filename (e.g., cosmic-ape-42.md → /nft/cosmic-ape-42).
+ *
+ * getStaticPaths() tells Astro which pages to generate.
+ * Each page gets the NFT data passed as props.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+// Tell Astro which pages to build (one per NFT)
+export async function getStaticPaths() {
+  const nfts = await getCollection('nfts');
+  return nfts.map(nft => ({
+    params: { slug: nft.id },
+    props: { nft },
+  }));
+}
+
+const { nft } = Astro.props;
+const { data } = nft;
+
+// Render the markdown body to HTML
+const { Content } = await render(nft);
+
+// Format the date nicely
+const formattedDate = new Date(data.date).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout
+  title={data.title}
+  description={data.description}
+  image={data.image}
+>
+  <a href="/" class="back-link">Back to Collection</a>
+
+  <div class="nft-detail">
+    <!-- Left: Image -->
+    <div class="nft-detail-image">
+      <img src={data.image} alt={data.title} />
+    </div>
+
+    <!-- Right: Info -->
+    <div class="nft-detail-info">
+      <span class="nft-detail-collection">{data.series}</span>
+      <h1 class="nft-detail-title">{data.title}</h1>
+      <p class="nft-detail-artist">{data.artist}</p>
+
+      <div class="nft-detail-meta">
+        {data.year && (
+          <div class="meta-item">
+            <span class="meta-label">Year</span>
+            <span class="meta-value">{data.year}</span>
+          </div>
+        )}
+        {data.medium && (
+          <div class="meta-item">
+            <span class="meta-label">Medium</span>
+            <span class="meta-value">{data.medium}</span>
+          </div>
+        )}
+        {data.dimensions && (
+          <div class="meta-item">
+            <span class="meta-label">Dimensions</span>
+            <span class="meta-value">{data.dimensions}</span>
+          </div>
+        )}
+        <div class="meta-item">
+          <span class="meta-label">Price</span>
+          <span class="meta-value">{data.price} {data.currency}</span>
+        </div>
+      </div>
+
+      <div class="nft-detail-description">
+        <Content />
+      </div>
+
+      <a
+        href={data.opensea_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="buy-button"
+      >
+        Acquire on OpenSea
+      </a>
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,141 @@
+---
+/**
+ * Gallery Home Page (index.astro → yoursite.com/)
+ *
+ * Displays all NFTs in a grid with filtering and sorting.
+ * The filtering/sorting is done client-side with JavaScript so
+ * the page doesn't need to reload when you change filters.
+ *
+ * How it works:
+ * 1. At build time: Astro reads all NFT markdown files and renders the full grid
+ * 2. At runtime: JavaScript handles filtering/sorting by showing/hiding cards
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NFTCard from '../components/NFTCard.astro';
+import { getCollection } from 'astro:content';
+
+// Fetch all NFTs from the content collection at build time
+const allNfts = await getCollection('nfts');
+
+// Sort by date (newest first) as default
+const nfts = allNfts.sort((a, b) =>
+  new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+
+// Get unique collection names for the filter dropdown
+const collections = [...new Set(nfts.map(n => n.data.series))].sort();
+---
+
+<BaseLayout title="Collection">
+  <div class="gallery-header">
+    <h1>Collection</h1>
+    <p>Selected works available for acquisition. Click any piece to view details.</p>
+  </div>
+
+  <!-- Filter & Sort Bar -->
+  <div class="filter-bar" id="filter-bar">
+    <div class="filter-group">
+      <label for="filter-collection">Series:</label>
+      <select id="filter-collection">
+        <option value="all">All Series</option>
+        {collections.map(c => (
+          <option value={c}>{c}</option>
+        ))}
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="sort-by">Sort by:</label>
+      <select id="sort-by">
+        <option value="date-desc">Newest First</option>
+        <option value="date-asc">Oldest First</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- NFT Grid -->
+  <div class="nft-grid" id="nft-grid">
+    {nfts.map(nft => (
+      <div
+        class="nft-grid-item"
+        data-series={nft.data.series}
+        data-price={nft.data.price}
+        data-date={nft.data.date.toISOString()}
+      >
+        <NFTCard
+          slug={nft.id}
+          title={nft.data.title}
+          artist={nft.data.artist}
+          series={nft.data.series}
+          price={nft.data.price}
+          currency={nft.data.currency}
+          image={nft.data.image}
+          status={nft.data.status}
+        />
+      </div>
+    ))}
+  </div>
+
+  <div class="no-results" id="no-results" style="display: none;">
+    No NFTs match your filters.
+  </div>
+</BaseLayout>
+
+<!--
+  Client-side JavaScript for filtering & sorting.
+  This runs in the browser, not at build time.
+  The <script> tag in Astro is automatically bundled and optimized.
+-->
+<script>
+  const grid = document.getElementById('nft-grid')!;
+  const filterSelect = document.getElementById('filter-collection') as HTMLSelectElement;
+  const sortSelect = document.getElementById('sort-by') as HTMLSelectElement;
+  const noResults = document.getElementById('no-results')!;
+
+  function applyFiltersAndSort() {
+    const collection = filterSelect.value;
+    const sortBy = sortSelect.value;
+    const items = Array.from(grid.querySelectorAll('.nft-grid-item')) as HTMLElement[];
+
+    // Filter
+    let visibleCount = 0;
+    items.forEach(item => {
+      const match = collection === 'all' || item.dataset.series === collection;
+      item.style.display = match ? '' : 'none';
+      if (match) visibleCount++;
+    });
+
+    // Sort visible items
+    const sorted = items
+      .filter(item => item.style.display !== 'none')
+      .sort((a, b) => {
+        switch (sortBy) {
+          case 'price-asc':
+            return parseFloat(a.dataset.price!) - parseFloat(b.dataset.price!);
+          case 'price-desc':
+            return parseFloat(b.dataset.price!) - parseFloat(a.dataset.price!);
+          case 'date-asc':
+            return new Date(a.dataset.date!).getTime() - new Date(b.dataset.date!).getTime();
+          case 'date-desc':
+            return new Date(b.dataset.date!).getTime() - new Date(a.dataset.date!).getTime();
+          default:
+            return 0;
+        }
+      });
+
+    // Re-order DOM elements
+    sorted.forEach(item => grid.appendChild(item));
+
+    // Also move hidden items to end
+    items.filter(item => item.style.display === 'none')
+      .forEach(item => grid.appendChild(item));
+
+    // Show "no results" if needed
+    noResults.style.display = visibleCount === 0 ? '' : 'none';
+  }
+
+  filterSelect.addEventListener('change', applyFiltersAndSort);
+  sortSelect.addEventListener('change', applyFiltersAndSort);
+</script>
