@@ -477,7 +477,9 @@ img {
   }
 
   .nft-detail-meta {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
   }
 
   .filter-bar {
