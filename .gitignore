@@ -35,3 +35,9 @@ AGENTS.md
 
 SETUP_GUIDE.md
 SSH_MULTI_ACCOUNT.md
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
