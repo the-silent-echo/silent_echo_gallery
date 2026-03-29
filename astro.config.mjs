@@ -6,5 +6,5 @@ import { defineConfig } from 'astro/config';
 // No adapter needed for static sites; the adapter is only required for SSR.
 export default defineConfig({
   output: 'static',
-  site: 'https://silent-echo-gallery.pages.dev',
+  site: 'https://silent-echo.org',
 });
